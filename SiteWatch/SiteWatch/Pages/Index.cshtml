@@ -1,0 +1,66 @@
+﻿@page
+@model SiteWatch.Pages.IndexModel
+@{
+    ViewData["Title"] = "SiteWatch";
+}
+
+<h1>SiteWatch</h1>
+<p class="text-muted">
+    Endpoint uptime monitor - SWE40006 Deployment Portfolio Task 2.<br />
+    History backend: <strong>@Model.Backend</strong> &middot;
+    Checked at @DateTime.UtcNow.ToString("u")
+</p>
+
+<p>
+    <a class="btn btn-primary" href="/">Refresh checks</a>
+    <a class="btn btn-outline-secondary" href="/api/status">API (JSON)</a>
+    <a class="btn btn-outline-secondary" href="/healthz">Health</a>
+</p>
+
+<h2>Current status</h2>
+<table class="table table-sm table-striped">
+    <thead>
+        <tr><th>Endpoint</th><th>URL</th><th>Status</th><th>HTTP</th><th>Response</th></tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model.Results)
+        {
+            <tr>
+                <td>@r.Name</td>
+                <td><small>@r.Url</small></td>
+                <td>
+                    @if (r.IsUp)
+                    {
+                        <span class="badge bg-success">UP</span>
+                    }
+                    else
+                    {
+
+                        <span class="badge bg-danger">DOWN</span>
+                    }
+                </td>
+                <td>@r.StatusCode</td>
+                <td>@r.ResponseTimeMs ms</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model.History.Any())
+{
+    <h2>Recent history</h2>
+    <table class="table table-sm">
+        <thead><tr><th>When (UTC)</th><th>Endpoint</th><th>HTTP</th><th>Response</th></tr></thead>
+        <tbody>
+            @foreach (var h in Model.History)
+            {
+                <tr>
+                    <td><small>@h.CheckedAtUtc.ToString("u")</small></td>
+                    <td>@h.Name</td>
+                    <td>@h.StatusCode</td>
+                    <td>@h.ResponseTimeMs ms</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
